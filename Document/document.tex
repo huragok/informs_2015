@@ -293,6 +293,224 @@ Relay HARQ Channel}
   }
 \end{frame}
 
+\begin{frame}
+  \frametitle{HARQ-Chase Combining (CC) Protocol (Continued)}
+  The receiver combines all the received symbols across all
+  retransmissions so far until decoding is determined successful.
+  \begin{center}
+    \includegraphics<1>[height=3cm]{./figs/ml.pdf}
+    \includegraphics<2>[height=3cm]{./figs/ml_1.pdf}
+    \includegraphics<3>[height=3cm]{./figs/ml_m.pdf}
+  \end{center}
+  \begin{block}{Maximum Likelihood (ML) detector}
+    \begin{align*}
+      p^* = \arg\min_p\sum_{k=0}^{m} \frac{|y_2^{(k)} -
+      \alpha^{(k)} g_2^{(k)} h_1^{(k)}\psi_k[p]|^2}
+      {\sigma_2^2+(\alpha^{(k)})^2\sigma_R^2|g_2^{(k)}|^2}.
+    \end{align*}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{MoDiv Design: Criterion}
+  \begin{block}{Bit Error Rate (BER) upperbound after $m$-th retransmission}
+    \begin{align*}
+      P_{BER}^{(m)} = \sum_{p=0}^{Q - 1}\sum_{q=0}^{Q - 1}\frac{D[p,
+      q]}{Q\log_2Q}P_{PEP}^{(m)}(q|p), \label{eq:P_BER}
+    \end{align*}
+  \end{block}
+  \begin{itemize}
+    \item $D[p,q]$: hamming distance between the bit representation of label $p$
+    and $q$.
+    \item $P_{PEP}^{(m)}(q|p)$: pairwise error probability (PEP), the
+    probability that when label $p$ is transmitted, but the receiver decides $q$
+    is more likely than $p$ after $m$-th retransmission.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{MoDiv Design: Criterion (Continued)}
+  Is minimizing $P_{BER}^{(m)}$ over the mappings $\psi_1[\cdot],\ldots,
+  \psi_m[\cdot]$ directly a good idea?
+  \begin{enumerate}
+    \item No one knows how many retransmissions is needed in advance (value
+    of $m$).
+    \item Jointly designing all $m$ mappings is prohibitively complex.
+    \item $P_{PEP}^{(m)}(q|p)$ can only be evaluated numerically, very slow and
+    could be inaccurate.
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}
+  \frametitle{MoDiv Design: Modified Criterion}
+  \begin{enumerate}
+    \item<1-> Successive optimization instead of joint optimization.
+      \visible<1->{
+        \begin{align*}
+          \mbox{Joint: }
+          \min_{\psi^{(k)},k=0,\ldots,m}P_{BER}^{(m)},\,m=1,\ldots,M
+        \end{align*}
+      }
+      \visible<2->{
+        \begin{align*}
+          \mbox{Successive: }
+          \min_{\psi^{(m)}|\psi^{(k)},k=0,\ldots,m-1}\tilde{P}_{BER}^{(m)},\,m=1,\ldots,M
+        \end{align*}
+      }
+    \item<3> A closed-form approximation to $P_{PEP}^{(m)}(q|p)$ that can be
+    iteratively updated for growing $m$.
+    \begin{align*}
+      \tilde{P}_{PEP}^{(m)}(q|p) &= \tilde{P}_{PEP}^{(m -
+      1)}(q|p)\tilde{E}_k[p,q] \\
+      \tilde{P}_{PEP}^{(-1)}(q|p) &= 1 / 2
+    \end{align*}
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Representation of CoRe}
+  Representing $\psi_m[\cdot]$ with $Q^2$ binary variables:
+  \begin{align*}
+    x_{pi}^{(m)} = \left\{ \begin{array}{cc}1 & \mbox{if } \psi_m[p] =
+    \psi_0[i]\\ 0 & \mbox{otherwise.}\end{array} \right. \,
+    p, i = 0,\ldots, Q - 1
+  \end{align*}
+  $\psi_0$ represents Gray-mapping for the original transmission (fixed).
+  \begin{block}{Constraints: $\psi_m[\cdot]$ as a permutation of $0,\ldots, Q -
+  1$}
+    \begin{columns}
+      \column{.3\textwidth}
+      \begin{align*}
+        \sum_{p=0}^{Q-1}x_{pi} & = 1\\
+        \sum_{i=0}^{Q-1}x_{pi} & = 1
+      \end{align*}
+      
+      \column{.7\textwidth}
+      \begin{tabular}{c|cccc}
+          \hline
+          & $i=0$ & $i=1$ & $i=2$ & $i = 3$\\
+          \hline
+          $p=0$ & 0 & 1 & 0 & 0 \\
+          $p=1$ & 0 & 0 & 1 & 0 \\
+          $p=2$ & 1 & 0 & 0 & 0 \\
+          $p=3$ & 0 & 0 & 0 & 1 \\
+          \hline
+      \end{tabular}
+    \end{columns}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{A Successive KB-QAP Formulation}
+  \begin{block}{MoDiv design via successive KB-QAP}
+    \begin{enumerate}[<+->]
+      \item Set $m = 1$. Initialize the ``distance'' matrix and the approximated
+      PEP, for $i,j,p,q=0,\ldots,Q-1$:
+      \begin{align*}
+        d_{ij} = \tilde{E}_k[i,j],\; \tilde{P}_{PEP}^{(0)}(q|p) = d_{pq}/2
+      \end{align*}
+      \item Evaluate the ``flow'' matrix:
+      \begin{align*}
+        f_{pq}^{(m)} = \frac{D[p,q]}{Q\log_2Q}\tilde{P}_{PEP}^{(m-1)}(q|p)
+      \end{align*}
+      \item Solve the $m$-th KB-QAP problem:
+      \begin{align*}
+        \min_{\{x_{pi}^{(m)}\}}
+        \sum_{p=0}^{Q-1}\sum_{i=0}^{Q-1}
+        \sum_{q=0}^{Q-1}\sum_{j=0}^{Q-1}
+        f_{pq}^{(m)}d_{ij}x_{pi}^{(m)}x_{qj}^{(m)}
+      \end{align*}
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{A Successive KB-QAP Formulation (Continued)}
+  \begin{block}{MoDiv design via successive KB-QAP}
+    \begin{enumerate}[<+->]
+      \setcounter{enumi}{3}
+      \item Update PEP:
+      \begin{align*}
+        \tilde{P}_{PEP}^{(m)}(q|p) & = \sum_{i=0}^{Q-1}
+        \sum_{j=0}^{Q-1}\tilde{P}_{PEP}^{(m
+        - 1)}(q|p)d_{ij}\hat{x}_{pi}^{(m)}\hat{x}_{qj}^{(m)}
+      \end{align*}
+      where $\hat{x}_{pi}^{(m)}$ is the solution from Step 3.
+      \item Increase $m$ by 1, return to Step 2 if $m \leq M$.
+    \end{enumerate}
+  \end{block}
+  \vfill
+\end{frame}
+
+\begin{frame}
+  \frametitle{Numerical Results: Simulation Settings}
+  \begin{itemize}[<+->]
+    \item 64-QAM constellation ($Q = 64$).
+    \item Maximum number of 4 retransmissions ($M = 4$).
+    \item Rayleigh-fading channels, the relay $R$ and destination $S_2$ have the
+    same Gaussian noise power $\sigma^2$.
+    \item Use a robust tabu search algorithm\footnotemark to solve each QAP
+    numerically.
+    \item Compare 3 MoDiv schemes:
+      \begin{enumerate}
+        \item No modulation diversity (NM)
+        \item A heuristic CoRe scheme for HSPA\footnotemark (CR)
+        \item QAP-based solution (QAP)
+      \end{enumerate}
+  \end{itemize}
+  \footnotetext[1]{E. Taillard, ``Robust taboo search for the quadratic
+  assignment problem,'' Parallel Computing, vol.17, no.4, pp.443-455, 1991.}
+  \footnotetext[2]{``Enhanced HARQ Method with Signal Constellation
+  Rearrangement,'' in 3rd Generation Partnership Project (3GPP), Technical
+  Specification TSGR1\#19(01)0237, Mar. 2001.}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Numerical Results: Uncoded BER}
+  \begin{columns}
+    \column{.5\textwidth}
+    \begin{figure}
+      \includegraphics[width=0.9\textwidth]{figs/BER_noise_power_MonteCarlo_64QAM_23.pdf}
+      \caption{$m=1,2$.}
+    \end{figure}
+    
+    \column{.5\textwidth}
+    \begin{figure}
+      \includegraphics[width=0.9\textwidth]{figs/BER_noise_power_MonteCarlo_64QAM_45.pdf}
+      \caption{$m=3,4$.}
+    \end{figure}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Numerical Results: Coded BER}
+  Add a Forward Error Correction (FEC) code so that
+  the coded BER drop rapidly as the noise power is below a certain level. The
+  result is termed ``waterfall curve'' which is commonly used to highlight the
+  performance gain in dB.
+  \begin{columns}
+    \column{.5\textwidth}
+    \begin{figure}
+      \includegraphics[width=0.9\textwidth]{figs/waterfall_2M3M_64QAM.pdf}
+      \caption{$m=1,2$.}
+    \end{figure}
+    
+    \column{.5\textwidth}
+    \begin{figure}
+      \includegraphics[width=0.9\textwidth]{figs/waterfall_4M5M_64QAM.pdf}
+      \caption{$m=3,4$.}
+    \end{figure}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Numerical Results: Average Throughput}
+  \begin{figure}
+    \includegraphics[width=0.7\textwidth]{figs/throughput_6M_64QAM.pdf}
+    \caption{Throughput comparison.}
+  \end{figure}
+\end{frame}
+
 \subsection[MoDiv for MIMO-HARQ]{MoDiv Design for Multiple-Input and
 Multiple-Output HARQ Channel}
 %------------------------------------------------
