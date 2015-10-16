@@ -80,6 +80,7 @@
 \usepackage{booktabs} % Allows the use of \toprule, \midrule and \bottomrule in tables
 \usepackage{xcolor}   % Allows for change of font color
 \usepackage{algorithm}
+\usepackage{mathtools}
 \usepackage{algpseudocode}
 \usepackage{bm}
 \usepackage{calc}
@@ -110,8 +111,190 @@
 
 \begin{document}
 
+\section[Application]{Appplication of QAP in Modulation Diversity (MoDiv)
+Design}
+
+\subsection[Backgrounds]{Backgrounds}
+
 \begin{frame}
+  \frametitle{Modulation Mapping}
+    \begin{columns}[c]
+      \column{.12\textwidth}
+        \begin{tabular}{c|c}
+          \hline
+          $p$ & bits \\
+          \hline
+          0 & 0000 \\
+          \alert<2>{1} & \alert<2>{0001} \\
+          2 & 0010 \\
+          \ldots & \ldots \\
+          15 & 1111 \\
+          \hline
+        \end{tabular}
+        
+      \column{.03\textwidth}
+      $\xrightarrow{\mbox{Map}}$
+      
+      \column{.2\textwidth}
+      \includegraphics<1>[height=3cm]{./figs/16QAM_bare.pdf}
+      \includegraphics<2>[height=3cm]{./figs/16QAM_bare_marked.pdf}
+      
+      \column{.07\textwidth}
+      $\xrightarrow{\mbox{Channel}}$
+      
+      \column{.25\textwidth}
+      \includegraphics<1>[height=3.5cm]{./figs/constellation_diagram.pdf}
+      \includegraphics<2>[height=3.5cm]{./figs/constellation_diagram_marked.pdf}
+      
+    \end{columns}
+    \begin{itemize}
+      \item Unideal wireless channel tends to cause demodulation errors.
+      \item Constellation points closer to each other are more likely to be
+      confused.
+    \end{itemize}
+    Modulation mapping needs to be carefully designed!
 \end{frame}
+
+\begin{frame}
+  \frametitle{Single Transmission: Gray-mapping}
+    \begin{block}{Strategy (Gray-mapping)}
+      Neighboring constellation points ({\color{red} horizontally} or
+      {\color{blue} vertically}) differ only by 1 bit, so as to
+      minimize the Bit Error Rate (BER).
+    \end{block}
+    \begin{figure}
+      \includegraphics[width=0.4\textwidth]{figs/16QAM_Gray.pdf}
+      \caption{Gray-mapping for 16-QAM, 3GPP TS 25.213.}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+  \frametitle{HARQ with Constellation Rearrangement (CoRe)}
+  \begin{block}{Hybrid Automatic Repeat reQuest (HARQ)}
+    \begin{itemize}
+      \item Same piece of information is retransmitted again and again, and
+      combined at the receiver until it is decoded successfully or expiration.
+      \item An error control scheme widely used in modern wireless systems such
+      as HSPA, WiMAX, LTE, etc.
+    \end{itemize}
+  \end{block}
+  \begin{block}{Constellation Rearrangement (CoRe)}
+    \begin{itemize}
+      \item For each round of retransmission, different modulation mappings are
+      used (explained next).
+      \item Exploit the Modulation Diversity (MoDiv).
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{An Example of CoRe}
+  \begin{columns}[c]
+    \column{.5\textwidth}<1->
+    \begin{figure}
+      \includegraphics[width=0.6\textwidth]{figs/CoRe_0.pdf}
+      \caption{Original transmission.}
+    \end{figure}
+    
+    \column{.5\textwidth}<2>
+    \begin{figure}
+      \includegraphics[width=0.6\textwidth]{figs/CoRe_1.pdf}
+      \caption{First retransmission.}
+    \end{figure}
+  \end{columns}
+  
+  \begin{itemize}
+    \item<1-> Original transmission: {\color{blue} 0111} is easily confused with
+    {\color{red} 1111}, but well distinguished from {\color{green} 0100}.
+    \item<2> First retransmission: {\color{blue} 0111} should now be mapped far away from {\color{red} 1111},
+    but can be close to {\color{green} 0100}.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{General Design of MoDiv Through CoRe}
+  \begin{block}{Challenges}
+    \begin{enumerate}
+      \item More than 1 retransmissions?
+      \item More general wireless channel models?
+      \item Larger constellations (e.g. 64-QAM)?
+    \end{enumerate}
+  \end{block}
+  
+  We formulated 2 different MoDiv design problems into \alert{Quadratic
+  Assignment Problems (QAPs)} and demonstrate the performance gain over existing
+  CoRe schemes.
+\end{frame}
+
+\subsection[MoDiv for TWRC-HARQ]{MoDiv Design for Two-Way Amplify-and-Forward
+Relay HARQ Channel}
+\begin{frame}
+  \frametitle{Two-Way Relay Channel (TWRC) with Analog Network Coding (ANC)}
+  \begin{itemize}
+    \item<1-> System components: 2 sources ($S_1$, $S_2$) communicate with each
+    other with the help of 1 relay ($R$).
+    \item<2-> Alternating between 2 phases:
+      \begin{itemize}
+        \item<2-> Multiple-Access Channel (MAC) phase: the 2 sources transmit to
+        the relay simultaneously.
+        \item<3> Broadcast Channel (BC) phase: the relay amplify and broadcast
+        the signal received during the MAC phase back to the 2 sources
+      \end{itemize}
+  \end{itemize}
+  \vfill
+  \begin{columns}[t]
+    \column{.5\textwidth}
+    \begin{figure}
+      \includegraphics<1>[width=0.8\textwidth]{figs/model.pdf}
+      \includegraphics<2>[width=0.8\textwidth]{figs/model_MAC.pdf}
+      \includegraphics<3>[width=0.8\textwidth]{figs/model_BC.pdf}
+      \caption{TWRC-ANC channel.}
+    \end{figure}
+    
+    \column{.5\textwidth}
+    \only<2>{
+      \begin{align*}
+        y_R = h_1x_1+h_2x_2+n_R
+      \end{align*}
+    }
+    \only<3>{
+      \begin{align*}
+        y_1 &= \alpha g_1 y_R + n_1, \\
+        y_2 &= \alpha g_2 y_R + n_2
+      \end{align*}
+    }
+    
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+  \frametitle{HARQ-Chase Combining (CC) Protocol}
+  \begin{itemize}
+    \item $Q$: size of the constellation.
+    \item $M$: maximum number of retransmissions.
+    \item $\psi_m[p]$, $m=0,\ldots, M$, $p=0,\ldots,Q-1$: constellation mapping
+    function between ``label'' $p$ to a constellation point for the $m$-th
+    retransission.
+  \end{itemize}
+  Due to symmetry of the channel, consider the transmission from $S_1$ to $S_2$
+  only. The received signal during the $m$-th retransmission of label $p$ is:
+  \only<1>{
+    \begin{align*}
+      y_2^{(m)} = \alpha^{(m)} g_2^{(m)}(h_1^{(m)}\psi_m[p] +
+      {\color{red}h_2^{(\tilde{m})}\psi_{\tilde{m}}[\tilde{p}]} + n_R^{(m)}) +
+      n_2^{(m)},
+    \end{align*}
+  }
+  \only<2>{
+    \begin{align*}
+      y_2^{(m)} = \alpha^{(m)} g_2^{(m)}(h_1^{(m)}\psi_m[p] + n_R^{(m)}) +
+      n_2^{(m)},\, \mbox{(after SIC)}
+    \end{align*}
+  }
+\end{frame}
+
+\subsection[MoDiv for MIMO-HARQ]{MoDiv Design for Multiple-Input and
+Multiple-Output HARQ Channel}
 %------------------------------------------------
 
 %----------------------------------------------------------------------------------------
