@@ -402,7 +402,7 @@ Relay HARQ Channel}
 
 \begin{frame}
   \frametitle{A Successive KB-QAP Formulation}
-  \begin{block}{MoDiv design via successive KB-QAP}
+  \begin{block}{MoDiv design via successive Koopman Beckmann-form QAP}
     \begin{enumerate}[<+->]
       \item Set $m = 1$. Initialize the ``distance'' matrix and the approximated
       PEP, for $i,j,p,q=0,\ldots,Q-1$:
@@ -426,7 +426,7 @@ Relay HARQ Channel}
 
 \begin{frame}
   \frametitle{A Successive KB-QAP Formulation (Continued)}
-  \begin{block}{MoDiv design via successive KB-QAP}
+  \begin{block}{MoDiv design via successive Koopman Beckmann-form QAP}
     \begin{enumerate}[<+->]
       \setcounter{enumi}{3}
       \item Update PEP:
@@ -453,9 +453,9 @@ Relay HARQ Channel}
     numerically.
     \item Compare 3 MoDiv schemes:
       \begin{enumerate}
-        \item No modulation diversity (NM)
-        \item A heuristic CoRe scheme for HSPA\footnotemark (CR)
-        \item QAP-based solution (QAP)
+        \item No modulation diversity (NM).
+        \item A heuristic CoRe scheme for HSPA\footnotemark (CR).
+        \item QAP-based solution (QAP).
       \end{enumerate}
   \end{itemize}
   \footnotetext[1]{E. Taillard, ``Robust taboo search for the quadratic
@@ -528,30 +528,244 @@ Multiple-Output HARQ Channel}
   \end{itemize}
 \end{frame}
 
-\begin{frame}
+\begin{frame}[t]
   \frametitle{An Example of CoRe for MIMO}
   \begin{itemize}
-    \item A $1\times 2$ MIMO channel: $\mathbf{H} = [1, 1]$ (simple addition).
-    \item Different mapping across the 2 transmitting antennas:
-    \item Effective constellation seen by the receiver: $\psi_e = (\bm{\psi})_1
-    + (\bm{\psi})_2$.
+    \item<1-> A $1\times 2$ MIMO channel: $\mathbf{H} = [1, 1]$ (simple
+    addition).
+    \item<1-> Different mapping across the 2 transmitting antennas:
+    \item<2-> Effective constellation seen by the receiver: $\psi_e =
+    (\bm{\psi})_1 + (\bm{\psi})_2$.
+  \end{itemize}
+  \begin{columns}
+    \column{.5\textwidth}
+    \begin{center}
+      \includegraphics<1>[width=3cm]{figs/16QAM_Gray_iq.pdf}
+      \includegraphics<2>[width=3.5cm]{figs/16QAM_Gray_combined.pdf}
+      
+      \only<1>{Original transmission (Gray).}
+      \only<2>{Effective constellation mapping of the original transmission.}
+    \end{center}
+    
+    \column{.5\textwidth}
+    \begin{center}
+      \includegraphics<1>[width=3cm]{figs/16QAM_Gray_iq_1.pdf}
+      \includegraphics<2>[width=3.5cm]{figs/16QAM_Gray_combined_1.pdf}
+      
+      \only<1>{1st retransmission.}
+      \only<2>{Effective constellation mapping of the 1st retransmission.}
+    \end{center}
+  \end{columns}
+  \vfill
+  \only<2>{For HARQ-CC, this CoRe scheme of the 1st retransmission outperforms
+  the repeated use of the same Gray mapping across the 2 antennas!}
+\end{frame}
+
+\begin{frame}
+  \frametitle{MoDiv Design for MIMO Channel}
+  \begin{itemize}
+    \item MIMO channel model: correlated Rician fading channel
+    \begin{align*}
+      \mathbf{H}^{(m)} = \sqrt{\frac{K}{K + 1}}
+      \underbrace{\mathbf{H}_0}_\text{``Mean''} +
+      \sqrt{\frac{1}{K +
+      1}}\mathbf{R}^{1/2} \underbrace{\mathbf{H}_w^{(m)}}_\text{``Variation''}
+      \mathbf{T}^{1/2}
+    \end{align*}
+    $K$: Rician factor, $\mathbf{R}, \mathbf{T}$: correlation matrix or the
+    receiver and transmitter antennas.
+    \item HARQ protocol: HARQ-CC
+    \item Design Criterion: BER upperbound based on PEP, successive
+    optimization.
+  \end{itemize}
+  For now we consider the case of $N_T = 2$ (2 transmitting antennas).
+\end{frame}
+
+\begin{frame}
+  \frametitle{Representation of CoRe}
+  Representing the 2-D vector mapping function $\bm{\psi}_m[\cdot]$
+  with $Q^3$ binary variables:
+  \begin{align*}
+    x_{pij}^{(m)} = \left\{ \begin{array}{cc}1 & \mbox{if } \bm{\psi}_m[p] =
+    (\psi_0[i], \psi_0[j])^T\\ 0 & \mbox{otherwise.}\end{array} \right. \,
+    p, i, j = 0,\ldots, Q - 1
+  \end{align*}
+  $\psi_0$ represents Gray-mapping for the original transmission (fixed).
+  \begin{block}{Constraints: $\bm{\psi}_m[\cdot]$ as a permutation of $0,\ldots,
+  Q - 1$}
     \begin{columns}
-      \column{.5\textwidth}
+      \column{.3\textwidth}
+      \begin{align*}
+        \sum_{i=0}^{Q-1}\sum_{j=0}^{Q-1}x_{pij} & = 1\\
+        \sum_{p=0}^{Q-1}\sum_{j=0}^{Q-1}x_{pij} & = 1\\
+        \sum_{p=0}^{Q-1}\sum_{i=0}^{Q-1}x_{pij} & = 1
+      \end{align*}
+      
+      \column{.7\textwidth}
       \begin{center}
-        \includegraphics[width=3cm]{figs/16QAM_Gray_iq.pdf}
-        
-        Original transmission (Gray).
+        \includegraphics[width=0.7\textwidth]{figs/constraint_q3ap.pdf}
       \end{center}
       
-      \column{.5\textwidth}
-      \begin{center}
-        \includegraphics[width=3cm]{figs/16QAM_Gray_iq_1.pdf}
-        
-        1st retransmission.
-      \end{center}
     \end{columns}
-  \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{A Successive Q3AP Formulation}
+  \begin{block}{MoDiv design via successive Q3AP}
+    \begin{enumerate}[<+->]
+      \item Set $m = 1$. Initialize the ``distance'' matrix and the approximated
+      PEP, for $p, q, i, j, k, l=0,\ldots,Q-1$:
+      \begin{align*}
+        d_{ikjl} = \tilde{E}_k[i,j],\; \tilde{P}_{PEP}^{(0)}(q|p) = d_{pqpq}/2
+      \end{align*}
+      \item Evaluate the ``flow'' matrix:
+      \begin{align*}
+        f_{pq}^{(m)} = \frac{D[p,q]}{Q\log_2Q}\tilde{P}_{PEP}^{(m-1)}(q|p)
+      \end{align*}
+      \item Solve the $m$-th Q3AP problem:
+      \begin{align*}
+        \min_{\{x_{pij}^{(m)}\}}
+        \sum_{p=0}^{Q-1}\sum_{i=0}^{Q-1}\sum_{j=0}^{Q-1}
+        \sum_{q=0}^{Q-1}\sum_{k=0}^{Q-1}\sum_{l=0}^{Q-1}
+        f_{pq}^{(m)}d_{ikjl}x_{pij}^{(m)}x_{qkl}^{(m)}
+      \end{align*}
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{A Successive Q3AP Formulation (Continued)}
+  \begin{block}{MoDiv design via successive Q3AP}
+    \begin{enumerate}[<+->]
+      \setcounter{enumi}{3}
+      \item Update PEP:
+      \begin{align*}
+        \tilde{P}_{PEP}^{(m)}(q|p) & = \sum_{i=0}^{Q-1} \sum_{k=0}^{Q-1}
+        \sum_{j=0}^{Q-1} \sum_{l=0}^{Q-1}\tilde{P}_{PEP}^{(m
+        - 1)}(q|p)d_{ikjl}\hat{x}_{pij}^{(m)}\hat{x}_{qkl}^{(m)}
+      \end{align*}
+      where $\hat{x}_{pij}^{(m)}$ is the solution from Step 3.
+      \item Increase $m$ by 1, return to Step 2 if $m \leq M$.
+    \end{enumerate}
+  \end{block}
+  \vfill
+\end{frame}
+
+\begin{frame}
+  \frametitle{Comments}
   
+  \begin{itemize}
+    \item The $Q^4$ ``distance'' matrix has $Q^4$ elelments. However, for
+    $Q$-QAM constellation, it only has $\mathcal{O}(Q^2)$ unique value, can be
+    computed more efficiently.
+    \item When $N_T > 2$, the MoDiv design can be formulated into a quadratic
+    $(N_T + 1)$-dimensional problem, with $Q$-by-$Q$ ``flow'' matrix and $Q ^
+    {2N_T}$ ``distance'' matrix, which might be too complex to solve. However,
+    one can always apply a $N_T$-by-$2$ linear precoding matrix to reduce the
+    channel into a $N_R$-by-$2$ channel to partly explore modulation diveristy.
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Numerical Results: Simulation Settings}
+  \begin{itemize}[<+->]
+    \item 64-QAM constellation ($Q = 64$).
+    \item Maximum number of 4 retransmissions ($M = 4$).
+    \item Correlated Rician-fading channels, $\mathbf{H}_0 = [1, 1]$,
+    correlation factor $\rho = 0.7$.
+    \item Use a modified iterative local search algorithm\footnotemark to
+    solve each Q3AP numerically.
+    \item Compare 3 MoDiv schemes:
+      \begin{enumerate}
+        \item No modulation diversity with maximum SNR beam-forming (NM).
+        \item A heuristic CoRe scheme for HSPA with maximum SNR
+        beam-forming (CR).
+        \item Q3AP-based solution (Q3AP).
+      \end{enumerate}
+  \end{itemize}
+  \footnotetext[1]{T. St\"{u}tzle, and D. Marco, ``Local search and
+  metaheuristics for the quadratic assignment problem,'' Technical Report
+  AIDA-01-01, Intellectics Group, Darmstadt University of Technology, Germany,
+  2001.}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Numerical Results: Uncoded BER vs Noise Power}
+  \begin{columns}
+    \column{.5\textwidth}
+    \begin{figure}
+      \includegraphics[width=0.9\textwidth]{figs/BER_noise_power_MonteCarlo_64QAM_23_Q3AP.pdf}
+      \caption{$m=1,2$.}
+    \end{figure}
+    
+    \column{.5\textwidth}
+    \begin{figure}
+      \includegraphics[width=0.9\textwidth]{figs/BER_noise_power_MonteCarlo_64QAM_45_Q3AP.pdf}
+      \caption{$m=3,4$.}
+    \end{figure}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Numerical Results: Uncoded BER vs $K$}
+  Larger $K$ $\leftrightarrow$ the channel is less random.
+  \begin{columns}
+    \column{.5\textwidth}
+    \begin{figure}
+      \includegraphics[width=0.9\textwidth]{figs/BER_K_MonteCarlo_64QAM_6.pdf}
+      \caption{$m=1,2$, $1/\sigma^2 = 6dB$.}
+    \end{figure}
+    
+    \column{.5\textwidth}
+    \begin{figure}
+      \includegraphics[width=0.9\textwidth]{figs/BER_K_MonteCarlo_64QAM_2.pdf}
+      \caption{$m=3,4$, $1/\sigma^2 = 2dB$.}
+    \end{figure}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Numerical Results: Coded BER}
+  \begin{columns}
+    \column{.5\textwidth}
+    \begin{figure}
+      \includegraphics[width=0.9\textwidth]{figs/waterfall_2M3M_64QAM_Q3AP.pdf}
+      \caption{$m=1,2$.}
+    \end{figure}
+    
+    \column{.5\textwidth}
+    \begin{figure}
+      \includegraphics[width=0.9\textwidth]{figs/waterfall_4M5M_64QAM_Q3AP.pdf}
+      \caption{$m=3,4$.}
+    \end{figure}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Numerical Results: Average Throughput}
+  \begin{figure}
+    \includegraphics[width=0.7\textwidth]{figs/throughput_5M_64QAM_Q3AP.pdf}
+    \caption{Throughput comparison.}
+  \end{figure}
+\end{frame}
+
+\subsection{Conclusion}
+\begin{frame}
+  \frametitle{Conclusion}
+  \begin{itemize}[<+->]
+    \item Formulate Modulation Diversity (MoDiv) design for wireless
+    communication system into Quadratic Assignment Problems (QAPs):
+    \begin{enumerate}
+      \item Two-Way Relay Analog Network Coding Rayleigh-fading channel:
+      successive Koopman-Beckmann QAP.
+      \item Correlated Rician-fading Multiple-Input and Multiple-Output channel:
+      successive Q3AP.
+    \end{enumerate}
+    \item Significant performance gain for a wide range of settings over
+    existing heuristic MoDiv schemes. 
+  \end{itemize}
 \end{frame}
 %------------------------------------------------
 
