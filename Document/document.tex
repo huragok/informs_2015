@@ -513,6 +513,46 @@ Relay HARQ Channel}
 
 \subsection[MoDiv for MIMO-HARQ]{MoDiv Design for Multiple-Input and
 Multiple-Output HARQ Channel}
+\begin{frame}
+  \frametitle{Multiple-Input and Multiple-Output (MIMO) Channel}
+  \begin{figure}
+    \includegraphics[width=0.5\textwidth]{figs/mimo.pdf}
+    \caption{A $2\times 2$ MIMO channel, $y_1 = h_{11}x_1 + h_{21}x_2 + n_1$,
+    $y_2 = h_{12}x_1 + h_{22}x_2 + n_2$, or simply $\mathbf{y} = \mathbf{Hx}
+    + \mathbf{n}$.}
+  \end{figure}
+  \begin{itemize}
+    \item An essential element in most modern wireless communication standards:
+    Wi-Fi, HSPA+, LTE, WiMAX, etc.
+    \item How do we generalize the idea of MoDiv design for MIMO channel?
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{An Example of CoRe for MIMO}
+  \begin{itemize}
+    \item A $1\times 2$ MIMO channel: $\mathbf{H} = [1, 1]$ (simple addition).
+    \item Different mapping across the 2 transmitting antennas:
+    \item Effective constellation seen by the receiver: $\psi_e = (\bm{\psi})_1
+    + (\bm{\psi})_2$.
+    \begin{columns}
+      \column{.5\textwidth}
+      \begin{center}
+        \includegraphics[width=3cm]{figs/16QAM_Gray_iq.pdf}
+        
+        Original transmission (Gray).
+      \end{center}
+      
+      \column{.5\textwidth}
+      \begin{center}
+        \includegraphics[width=3cm]{figs/16QAM_Gray_iq_1.pdf}
+        
+        1st retransmission.
+      \end{center}
+    \end{columns}
+  \end{itemize}
+  
+\end{frame}
 %------------------------------------------------
 
 %----------------------------------------------------------------------------------------
