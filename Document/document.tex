@@ -240,6 +240,8 @@ Relay HARQ Channel}
         \item<3> Broadcast Channel (BC) phase: the relay amplify and broadcast
         the signal received during the MAC phase back to the 2 sources
       \end{itemize}
+    \item Assume Rayleigh-fading channel: $g$ and $h$ are complex Gaussian
+    random variables with 0 means.
   \end{itemize}
   \vfill
   \begin{columns}[t]
@@ -368,6 +370,31 @@ Relay HARQ Channel}
 \end{frame}
 
 \begin{frame}
+  \frametitle{Approximation of the Pairwise Error Probability}
+  \begin{align*}
+    \tilde{E}_k[p,q] & \approx \mathbb{E} \left[\exp\left(
+    -\frac{(\alpha^{(k)})^2\epsilon_k[p,q]|g_2^{(k)}|^2 |h_1^{(k)}|^2}
+    {4(\tilde{\sigma}_2^{(k)})^2} \right)\right],\\
+    \tilde{E}_k[p,q] & = \frac{4\sigma_R^2
+    + \beta_{h_1}\epsilon_k[p,q]v\exp(v)Ei(v)}{u}
+    \\
+    u = 4\sigma_R^2 + & \beta_{h_1}\epsilon_k[p,q],\;
+    v =
+    \frac{4\sigma_2^2}{\tilde{\alpha}^2\beta_{g_2}u},\;
+    \tilde{\alpha} = \sqrt{\frac{P_R}{\beta_{h_1}P_1 +
+    \beta_{h_2}P_2+\sigma_R^2}}.
+  \end{align*}
+  \begin{itemize}
+    \item $\beta_{g_2}$, $\beta_{h_1}$: the variance of the complex Gaussian
+    distributed channel $g_2$ and $h_1$.
+    \item $\sigma_R^2$, $\sigma_2^2$: the noise power at $R$ and $S_2$.
+    \item $\epsilon_k[p,q] = \psi_k[p] - \psi_k[q].$
+    \item $P_R, P_1, P_2$: the maximum transmitting power constraint at
+    $R,S_1,S_2$.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
   \frametitle{Representation of CoRe}
   Representing $\psi_m[\cdot]$ with $Q^2$ binary variables:
   \begin{align*}
@@ -407,7 +434,7 @@ Relay HARQ Channel}
       \item Set $m = 1$. Initialize the ``distance'' matrix and the approximated
       PEP, for $i,j,p,q=0,\ldots,Q-1$:
       \begin{align*}
-        d_{ij} = \tilde{E}_k[i,j],\; \tilde{P}_{PEP}^{(0)}(q|p) = d_{pq}/2
+        d_{ij} = \tilde{E}_0[i,j],\; \tilde{P}_{PEP}^{(0)}(q|p) = d_{pq}/2
       \end{align*}
       \item Evaluate the ``flow'' matrix:
       \begin{align*}
@@ -447,7 +474,7 @@ Relay HARQ Channel}
   \begin{itemize}[<+->]
     \item 64-QAM constellation ($Q = 64$).
     \item Maximum number of 4 retransmissions ($M = 4$).
-    \item Rayleigh-fading channels, the relay $R$ and destination $S_2$ have the
+    \item Assume the relay $R$ and destination $S_2$ have the
     same Gaussian noise power $\sigma^2$.
     \item Use a robust tabu search algorithm\footnotemark to solve each QAP
     numerically.
@@ -617,7 +644,8 @@ Multiple-Output HARQ Channel}
       \item Set $m = 1$. Initialize the ``distance'' matrix and the approximated
       PEP, for $p, q, i, j, k, l=0,\ldots,Q-1$:
       \begin{align*}
-        d_{ikjl} = \tilde{E}_k[i,j],\; \tilde{P}_{PEP}^{(0)}(q|p) = d_{pqpq}/2
+        d_{ikjl} = \tilde{E}_0[i,k,j,l],\; \tilde{P}_{PEP}^{(0)}(q|p) =
+        d_{pqpq}/2
       \end{align*}
       \item Evaluate the ``flow'' matrix:
       \begin{align*}
@@ -650,6 +678,25 @@ Multiple-Output HARQ Channel}
     \end{enumerate}
   \end{block}
   \vfill
+\end{frame}
+
+\begin{frame}
+  \frametitle{Approximation of the Pairwise Error Probability}
+  \begin{align*}
+    & \tilde{E}_0[i,k,j,l] = \mathbb{E}\left[\exp\left(-\frac{\|\mathbf{H}
+    \mathbf{e}_0[i,k,j,l]\|^2}{4\sigma^2}\right)\right]\\
+    &= \frac{(4\sigma^2)^{N_R}}{\det(\mathbf{S})}
+        \exp\left(-\bm{\mu}^H\mathbf{S}^{-1}
+        \bm{\mu}\right) \\
+    & \bm{\mu} = \sqrt{\frac{K}{K+1}}\mathbf{H}_0\mathbf{e}[i,k,j,l],\\
+    & \mathbf{S} = 4\sigma^2\mathbf{I} + \frac{1}{K + 1}
+    (\mathbf{e}^H[i,k,j,l]\mathbf{T}\mathbf{e}[i,k,j,l])\mathbf{R}
+  \end{align*}
+  \begin{itemize}
+    \item $\sigma^2$: the noise power at each receiver antenna.
+    \item $\mathbf{e}[i,k,j,l] = (\psi_0[i] - \psi_0[k], \psi_0[j] -
+    \psi_0[l])^T$
+  \end{itemize}
 \end{frame}
 
 \begin{frame}

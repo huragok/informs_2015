@@ -1,0 +1,141 @@
+[Page 1-2]
+In digital wireless communication systems, bits are mapped to constellation symbols, then the constellation symbols are further processed, transmitted throught the channel and received.
+
+Due to channel imperfection, such as fading and noise, the receiver may not be able to demodulate symobls back into bits correctly. For instance, <in figure 3>, it is difficult to decide whether the received symbol <red dot> corresponds to the top-rightmost point or the one to the left of it. 
+
+In common wireless channels, constellation points close to each other are easily confused, while constellation points far away from each other are less likely to be confused. As a result, through careful design of modulation mapping, i.e. how the bits are mapped to contellation points, the impact of channel imperfection can be minimized.
+
+[Page 3]
+If the information are transmitted only once, Gray-mapping is usually adopted. In this strategy, the bit sequences corresponding to neighboring constellation symbols differ by only 1 bit. Therefore, when the most-likely demodulation errors happen, i.e. neighboring constellation symbols are confused with each other, there is only 1-bit of demodulation error. In this way, the bit error rate (BER) is minimized.
+
+[Page 4]
+However, in modern communication systems, a same piece of information is usually not only transmitted once. One effective and widely-in-use error control scheme is called Hybrid automatic repeat request (HARQ). In this scheme,  a same piece of information is retransmitted again and again (probably in different forms). As the receiver receives more and more ``copy'' of the same piece of information, by combining this copies it is less likely to make a demodulation mistake. The retransmission ends one the receiver declares a demodulation success, or the maximum number of retransmission is reached.
+
+One technique to improve the performace of HARQ system is constellation rearrangement (CoRe). Basically, for each round of retransmission, a same bit sequence is mapped to a different constellation points using a different modulation mapping function. In this way, one expoits the modulation diversity.
+
+[Page 5-6]
+One example of CoRe is as follows. As a convention, the original transmission usually uses Gray mapping. As a result, one can see that `0111' (blue) is easily confused with '1111' (red), however, '0100' is unlikely to be confused with '0100'.
+
+As a remedy, during the second transmission, or the first retransmission, `0111' and '1111' is mapped away from each other. On the other hand, `0111' can be mapped close to '0100'.
+
+[Page 7]
+How can you extend the idea of CoRe? There are 3 challenges. Firstly, what if there are more than 1 retransmission? Also, what if we have a more complicated channel model than simple additive white noise Gaussian (AWGN) channel? Finally, it is very common for a modern communication system to use a middle-size constellation such as 64-QAM, the CoRe design is much more complicated than 16QAM, how can we deal with it?
+
+We formulated 2 different MoDiv design problems into Quadratic Assignment Problems (QAPs) and demonstrate the performance gain over existing CoRe schemes.
+
+[Page 8-10]
+Our first MoDiv design problems is about Two Way Relay Channel (TWRC) with Analog Network Coding (ANC). The system is composed of 2 sources S_1 and S_2 who are communicating with each other through a relay node R. The entire system works alternatingly in 2 phases.
+
+1. During the multiple-access (MAC) channel phase, the 2 sources transmit to the relay simultaneously,
+(h1, h2 are the channels, x1, x2 are the symbols, and nR is the noise received at the relay. yR is the received signal at the relay)
+
+2. During the broadcast channel (BC) phase, the relay amplify the signal it received during the previous phase and transmit it back to the 2 sources
+(g1, g2 denote the channels, alpha represent the power normalization factor, n1, n2 are the noises, and y1, y2 are the received signals)
+
+We assume that the channel follows Rayleigh fading model, i.e. both g and h are complex Gaussian random variable with 0 means.
+
+[Page 11-12]
+In this system, we adopts a HARQ-Chase Combining protocol, in which the same information bits are being retransmitted at the transmitter using different mappings and combined at the receiver for demodulation. Denote Q as the size of constellation, M as the maximum number of retransmissions, and $\psi_m[p]$ as the mapping function for the m-th retransmission. Note that $\psi_0[p]$ represents the original transmission which always uses Gray mapping.
+
+Due to symmetry of the system, we consider the transmission from S1 to S2 only. The received signal at S2 during the m-th retransmission of label p is y2m. Since S2 has a very good idea what it transmitted during the previous MAC phase and we assume it has perfect knowledge of the channel information, we assume that it can cancel out the part in y2m corresponding to its own transmission <the red part>. 
+
+Consequently, after the self-interference cancellation (SIC), the received signal is as follows.
+
+[Page 13-15]
+The receiver combines all the received signal from different retransmissions corresponding to a bit sequence and use a maximum likelihood detector to demodulate it. Then it uses a Cyclic redundancy check (CRC) code to detect whether there are errors in the demodulated code. If so, it sends a NACK to the transmitter to request the next retransmission. After the receiver accumulates enough retransmission to successfully demodulate, it sends an ACK to the transmitter. Or when the maximum number of retransmission is reached and still cannot demodulate correctly, then the HARQ fails for this bit sequence.
+
+[Page 16]
+Our MoDiv design is meant to minimize the bit error rate (BER). However, the exact evaluation of BER is not tractable. Therefore we use the following BER upper bound after the m-th retransmission. In this equation D[p,q] is the hamming distance between the bit representation of label p and q, i.e. how many bits are different between the 2 log2Q-length bit sequence. P_PEP represents the pair wise error probability (PEP), that is, the probability that the ML detector favors q over p when p is actually transmitted.
+
+[Page 17]
+However, there are a few more things to consider for the MoDiv design. 
+
+Firstly, no one knows how many retransmissions is needed in advance for each label p. What value of m should we use?
+
+Secondly, even if we are given a m, the joint design of all m mapping functions will be prohibitively complex.
+
+Thirdly, the pair-wise error probability is difficult to evaluate exactly for Rayleigh fading channel. Numerical methods are two slow when Q is large.
+
+How should we address these problems?
+
+[Page 18-19]
+The first trick is that instead of jointly optimizing m mapping functions, we perform a successive optimization: we iteratively optimize the m-th mapping function, given all the mapping functions for previous transmissions.
+
+Also, we adopt an approximation to the pairwise error probability which is in closed-form and very easy to update iteratively
+
+[Page 20]
+<Details, can be skipped>
+
+[Page 21]
+Any mapping function can be represented with a Q-by-Q binary matrix. As any mapping function must be a permutation of 0,...Q - 1, this matrix must contain exactly one 1 in each row and column, as shown in the example.
+
+[Page 22-26]
+Now we are in a good place to present our MoDiv design approach based on the successive minimization of approximated bit error rate. <go through the 5 steps>.
+
+[Page 27-35]
+We implement the above MoDiv design procedures and test its performance compared with existing constellation rearrangement (CoRe) schemes with numerical simulations.
+
+We use a 64-QAM constellation and allow a maximum number of 4 retransmissions. It is assumed that the $R$ and $S_2$ have the same noise power. Each KB-QAP problem is solved with a robust tabu search algorithm. 
+
+We compare 3 different MoDiv schemes: the first one is repeated use of the same Gray mapping across all retransmissions which is termed as NM, the second one is a heuristic constellation rearrangement scheme proposed for HSPA (a 3G communication standard) which is termed as CR, and the solution of our design approach, termed as (QAP).
+
+[Page 36]
+Firstly we compare the uncoded bit error rate performance, which is also our design objective. The left figure is the BER for the 1st and 2nd transmission, while the right figure is the BER for the 3rd and 4th retransmission. Our MoDiv design enjoys a much lower BER than the other 2 schemes
+
+[Page 37]
+Next we compare the coded bit error rate performance. The purpose of this simulation is to highlight the performance gain in terms of signal to noise ratio (1/sigma^2). By adding a FEC code, the BER curve will become much more steep. Another motivation is that we would like to test the robustness of our approach: the QAP is solved only at 1/sigma^2 = 4.5dB for m = 1, 2, 3, 4 although the Coded BER is tested over a wide range of noise power, which leads to a design parameter mismatch.
+
+Again the left figure is for the 1st and 2nd retransmission and the right figure is for the 3rd and 4th retransmission. Even under the design parameter mismatch, the QAP design still enjoys a remarkable performance gain over the other schemes. More importantly, since HARQ usually has a higher probability to retransmit fewer times, the performance gain for the 1st 2 retransmissions are more important. Here we see about 1 and 2 dB performance gain overr the heuristic method, and 2 and 5dB gain over the non-modulation diversity scheme.
+
+[Page 38]
+Finally, we present the average throughput of the above coded communication system. Since we uses a 64QAM constellation, each symbol carries 6 bits. But as we use a 3/4 FEC code, the actual information carried per symbol is 6 * 0.75 = 4.5 bits. When there is just 1 transmission, the throughput is 4.5bit/symbol; when there is 1 transmission and 1 retransmission, the throughput is 4.5/2 = 2.25bit/symbol; when there is 1 transmission and 2 retransmissions, the throughput is 4.5/3 = 1.5bit/symbol, etc. It is apparent to see that the QAP solution doubles the performance gain achieved by the heuristic CoRe scheme over the non-modulation diversity scheme.
+
+[Page 39]
+Our second MoDiv design problem is about multiple-input and multiple-output channel. A MIMO channel is between a transmitter with multiple antennas and a receiver with multiple antennas. A 2-by-2 MIMO channel is shown as an example here. MIMO channel has been widely in use in most modern wireless communciation standards. How can we generalize the idea of MoDiv design for MIMO channel.
+
+[Page 40-41]
+As an example of constellation rearrangement for MIMO channel, we consider a simple 1-by-2 channel, where H = [1, 1], which means the received symbol is simply the addition of the 2 transmitted symbol plus noise. Again as a convention the original transmission, the mappings of the original transmission uses the same Gray mapping across the 2 antennas.
+
+However, for the 1st retransmission, one can potentially uses different mappings than Gray. Moreover, it is possible to use 2 different mappings across the 2 transmitting antennas.
+
+The effective constellation seen by the receiver is simply the addition of the constellations across 2 antennas. For the original transmission, the effective constellation is still Gray-mapping 16QAM. However, for the first retransmission,  the effective constellation looks very different from 16QAM. In fact, it may not necessarily have the same number of constellation symbols!
+
+However, for a HARQ-CC system that combines the original transmission and the retransmission, this CoRe scheme actually performs better than the repeated use of the same Gray mapping across the 2 antennas!
+
+[Page 42]
+Now we formulate the MoDiv design problem for MIMO channel. Our channel model is the correlated Rician fading channel, where K is the Rician factor, R,T are the correlation matrix across the receiver antenna and transmitter antenna, respectively. H0 is a constant representing the channel means, while Hw is a random matrix with independent zero mean unit variance complex Gaussian random entries representing the variation of the channel.
+
+We use the same HARQ-CC protocol as for the Two-way relay analog network coding channel, and the same successive approximated BER minimization criterion. For now we consider the case of 2 transmitting antennas.
+
+[Page 43]
+The modulation mapping function is now defined as a 2-D vector valued function, which in turn can be represented with a Q-by-Q-by-Q 3-D matrix of binary variables. As either component of the mapping funciton is a permutation of 0,...Q-1, this 3-D matrix should satisfy the constraint that there is exactly one 1 in each ``slice'' along each dimension.
+
+[Page 44-48]
+The MoDiv design approach for MIMO channel is almost the same as before, except that we have a successive quadratic 3 dimensional problem (Q3AP). <go through the 5 steps>
+
+[Page 49]
+<Details, can be skipped>
+
+[Page 50]
+<go through the 2 comments>
+
+[Page 51-58]
+Again we demonstrate the performance gain of our MoDiv design approach via numerical results.<Go through the simulation settings as before>
+
+[Page 59]
+Uncoded BER results, <as before>
+
+[Page 60]
+Now we demonstrate the uncoded BER performance against K. As K becomes larger, i.e. the channel is less random, the BER decreses as expected. Moreover, as K increases, the performance gain of Q3AP solution over the other 2 schemes also increases.
+
+[Page 61-62]
+<same as before>
+
+[Page 63-65]
+<go through the conclusions>
+
+ 
+
+
+
+
