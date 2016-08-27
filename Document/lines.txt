@@ -91,48 +91,52 @@ Again the left figure is for the 1st and 2nd retransmission and the right figure
 Finally, we present the average throughput of the above coded communication system. Since we uses a 64QAM constellation, each symbol carries 6 bits. But as we use a 3/4 FEC code, the actual information carried per symbol is 6 * 0.75 = 4.5 bits. When there is just 1 transmission, the throughput is 4.5bit/symbol; when there is 1 transmission and 1 retransmission, the throughput is 4.5/2 = 2.25bit/symbol; when there is 1 transmission and 2 retransmissions, the throughput is 4.5/3 = 1.5bit/symbol, etc. It is apparent to see that the QAP solution doubles the performance gain achieved by the heuristic CoRe scheme over the non-modulation diversity scheme.
 
 [Page 39]
-Our second MoDiv design problem is about multiple-input and multiple-output channel. A MIMO channel is between a transmitter with multiple antennas and a receiver with multiple antennas. A 2-by-2 MIMO channel is shown as an example here. MIMO channel has been widely in use in most modern wireless communciation standards. How can we generalize the idea of MoDiv design for MIMO channel.
+Our second MoDiv design problem is about multiple-input and multiple-output (MIMO) coordinated multi-point (CoMP) channel. A MIMO channel is between a transmitter with multiple antennas and a receiver with multiple antennas. Here we are showing two cooperative transmitters and 1 receiver, all equipped with 2-by-2 multiple antennas. Such a CoMP channel model has been studied extensively recently and is applicable to some modern wireless communciation systems such as LTE-advanced. By designing different modulation/constellation mappings across different transmitters one could achieve more diversity gain. How can we generalize the idea of MoDiv design for MIMO-CoMP channel?
 
 [Page 40-41]
-As an example of constellation rearrangement for MIMO channel, we consider a simple 1-by-2 channel, where H = [1, 1], which means the received symbol is simply the addition of the 2 transmitted symbol plus noise. Again as a convention the original transmission, the mappings of the original transmission uses the same Gray mapping across the 2 antennas.
+As an example of constellation rearrangement for MIMO channel, we consider a simple model where both the 2 transmitters and the receiver has only one antenna and H_1=H_2 =1, which means the received symbol is simply the addition of the 2 transmitted symbol plus noise. Again as a convention the original transmission, the mappings of the original transmission uses the same Gray mapping across the 2 antennas.
 
-However, for the 1st retransmission, one can potentially uses different mappings than Gray. Moreover, it is possible to use 2 different mappings across the 2 transmitting antennas.
+However, for the 1st retransmission, one can potentially uses different mappings than Gray. Moreover, it is possible to use 2 different mappings across the 2 transmiters.
 
 The effective constellation seen by the receiver is simply the addition of the constellations across 2 antennas. For the original transmission, the effective constellation is still Gray-mapping 16QAM. However, for the first retransmission,  the effective constellation looks very different from 16QAM. In fact, it may not necessarily have the same number of constellation symbols!
 
 However, for a HARQ-CC system that combines the original transmission and the retransmission, this CoRe scheme actually performs better than the repeated use of the same Gray mapping across the 2 antennas!
 
 [Page 42]
-Now we formulate the MoDiv design problem for MIMO channel. Our channel model is the correlated Rician fading channel, where K is the Rician factor, R,T are the correlation matrix across the receiver antenna and transmitter antenna, respectively. H0 is a constant representing the channel means, while Hw is a random matrix with independent zero mean unit variance complex Gaussian random entries representing the variation of the channel.
+Now we formulate the MoDiv design problem for MIMO-CoMP channel. Our channel model is that between each transmitter and the receiver there is a correlated Rician fading channel, where K_a is the Rician factor, R_a,T are the correlation matrix across the receiver antenna and transmitter antenna, respectively. \bar{H}_a is a constant representing the channel means, while H_{w,a} is a random matrix with independent zero mean unit variance complex Gaussian random entries representing the variation of the channel.
 
-We use the same HARQ-CC protocol as for the Two-way relay analog network coding channel, and the same successive approximated BER minimization criterion. For now we consider the case of 2 transmitting antennas.
+[Page 43-44]
+We use the same HARQ-CC protocol as for the Two-way relay analog network coding channel, and the same successive optimization criterion to minimize the BER upperbound evaluated based on the approximated pairwise error probability (PEP). Again, the pairwise error probability of confusing label q and p after m retransmissions can be evaluated iteratively.
 
-[Page 43]
+[Page 45]
+These details on evaluating the PEP iteratively can be skipped.
+
+[Page 46]
 The modulation mapping function is now defined as a 2-D vector valued function, which in turn can be represented with a Q-by-Q-by-Q 3-D matrix of binary variables. As either component of the mapping funciton is a permutation of 0,...Q-1, this 3-D matrix should satisfy the constraint that there is exactly one 1 in each ``slice'' along each dimension.
 
-[Page 44-48]
+[Page 47-51]
 The MoDiv design approach for MIMO channel is almost the same as before, except that we have a successive quadratic 3 dimensional problem (Q3AP). <go through the 5 steps>
 
-[Page 49]
+[Page 52]
 <Details, can be skipped>
 
-[Page 50]
+[Page 53]
 <go through the 2 comments>
 
-[Page 51-58]
+[Page 54-62]
 Again we demonstrate the performance gain of our MoDiv design approach via numerical results.<Go through the simulation settings as before>
 
-[Page 59]
+[Page 63]
 Uncoded BER results, <as before>
 
-[Page 60]
+[Page 64]
 Now we demonstrate the uncoded BER performance against K. As K becomes larger, i.e. the channel is less random, the BER decreses as expected. Moreover, as K increases, the performance gain of Q3AP solution over the other 2 schemes also increases.
 
-[Page 61-62]
+[Page 65-66]
 <same as before>
 
-[Page 63-65]
-<go through the conclusions>
+[Page 67-70]
+<go through the conclusions> For more details we refer the interested audiences to our publications.
 
  
 
