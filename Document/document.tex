@@ -363,7 +363,7 @@ Relay HARQ Channel}
     iteratively updated for growing $m$.
     \begin{align*}
       \tilde{P}_{PEP}^{(m)}(q|p) &= \tilde{P}_{PEP}^{(m -
-      1)}(q|p)\tilde{E}_k[p,q] \\
+      1)}(q|p)E_m[p,q] \\
       \tilde{P}_{PEP}^{(-1)}(q|p) &= 1 / 2
     \end{align*}
   \end{enumerate}
@@ -372,11 +372,11 @@ Relay HARQ Channel}
 \begin{frame}
   \frametitle{Approximation of the Pairwise Error Probability}
   \begin{align*}
-    \tilde{E}_k[p,q] & \approx \mathbb{E} \left[\exp\left(
+    E_k[p,q] & = \mathbb{E} \left[\exp\left(
     -\frac{(\alpha^{(k)})^2\epsilon_k[p,q]|g_2^{(k)}|^2 |h_1^{(k)}|^2}
     {4(\tilde{\sigma}_2^{(k)})^2} \right)\right],\\
-    \tilde{E}_k[p,q] & = \frac{4\sigma_R^2
-    + \beta_{h_1}\epsilon_k[p,q]v\exp(v)Ei(v)}{u}
+    & \approx \frac{4\sigma_R^2
+    + \beta_{h_1}\epsilon_k[p,q]v\exp(v)Ei(v)}{u} \triangleq \tilde{E}_k[p,q] 
     \\
     u = 4\sigma_R^2 + & \beta_{h_1}\epsilon_k[p,q],\;
     v =
@@ -539,28 +539,30 @@ Relay HARQ Channel}
 \end{frame}
 
 \subsection[MoDiv for MIMO-HARQ]{MoDiv Design for Multiple-Input and
-Multiple-Output HARQ Channel}
+Multiple-Output COordinated Multi-Point Channel}
 \begin{frame}
-  \frametitle{Multiple-Input and Multiple-Output (MIMO) Channel}
+  \frametitle{Multiple-Input and Multiple-Output (MIMO) COordinated Multi-Point
+  (CoMP) Channel}
   \begin{figure}
-    \includegraphics[width=0.5\textwidth]{figs/mimo.pdf}
-    \caption{A $2\times 2$ MIMO channel, $y_1 = h_{11}x_1 + h_{21}x_2 + n_1$,
-    $y_2 = h_{12}x_1 + h_{22}x_2 + n_2$, or simply $\mathbf{y} = \mathbf{Hx}
-    + \mathbf{n}$.}
+    \includegraphics[width=0.8\textwidth]{figs/mimo.pdf}
+    \caption{2 coordinated multi-antenna Txs and 1 multi-antenna
+    Rx. Different modulation mapping at the two Txs during
+    retransmissions.}
   \end{figure}
+  \vspace{-10pt}
   \begin{itemize}
-    \item An essential element in most modern wireless communication standards:
-    Wi-Fi, HSPA+, LTE, WiMAX, etc.
-    \item How do we generalize the idea of MoDiv design for MIMO channel?
+    \item CoMP:  a promising technique to improve cell edge user data rate and
+    spectral efficiency (e.g. LTE-Advanced).
+    \item How do we generalize the idea of MoDiv design for MIMO-CoMP channel?
   \end{itemize}
 \end{frame}
 
 \begin{frame}[t]
   \frametitle{An Example of CoRe for MIMO}
   \begin{itemize}
-    \item<1-> A $1\times 2$ MIMO channel: $\mathbf{H} = [1, 1]$ (simple
-    addition).
-    \item<1-> Different mapping across the 2 transmitting antennas:
+    \item<1-> $N_{T,1}=N_{T,2}=N_{R}=1$: $\mathbf{H}_1 = \mathbf{H}_2=1$
+    (single antenna, simple addition, no precoding).
+    \item<1-> Different mapping across the 2 transmitters:
     \item<2-> Effective constellation seen by the receiver: $\psi_e =
     (\bm{\psi})_1 + (\bm{\psi})_2$.
   \end{itemize}
@@ -585,7 +587,7 @@ Multiple-Output HARQ Channel}
   \end{columns}
   \vfill
   \only<2>{For HARQ-CC, this CoRe scheme of the 1st retransmission outperforms
-  the repeated use of the same Gray mapping across the 2 antennas!}
+  the repeated use of the same Gray mapping across the 2 transmitters!}
 \end{frame}
 
 \begin{frame}
@@ -593,33 +595,76 @@ Multiple-Output HARQ Channel}
   \begin{itemize}
     \item MIMO channel model: correlated Rician fading channel
     \begin{align*}
-      \mathbf{H}^{(m)} = \sqrt{\frac{K}{K + 1}}
-      \underbrace{\mathbf{H}_0}_\text{``Mean''} +
-      \sqrt{\frac{1}{K +
-      1}}\mathbf{R}^{1/2} \underbrace{\mathbf{H}_w^{(m)}}_\text{``Variation''}
-      \mathbf{T}^{1/2}
+      \mathbf{H}_a^{(m)} = \sqrt{\frac{K_a}{K_a + 1}}
+      \underbrace{\bar{\mathbf{H}}_a}_\text{``Mean''} +
+      \sqrt{\frac{1}{K_a +
+      1}}\mathbf{R}^{1/2}
+      \underbrace{\mathbf{H}_{w,a}^{(m)}}_\text{``Variation''}
+      \mathbf{T}_a^{1/2}
     \end{align*}
-    $K$: Rician factor, $\mathbf{R}, \mathbf{T}$: correlation matrix or the
-    receiver and transmitter antennas.
+    $K$: Rician factor, $\mathbf{R}, \mathbf{T}_a$: correlation matrix or the
+    receiver and transmitter antennas, $a=1,2$ represent the 2 transmitters.
     \item HARQ protocol: HARQ-CC
     \item Design Criterion: BER upperbound based on PEP, successive
     optimization.
   \end{itemize}
-  For now we consider the case of $N_T = 2$ (2 transmitting antennas).
+  %!!!ADD REFERENCE HERE?
 \end{frame}
 
 \begin{frame}
-  \frametitle{Representation of CoRe}
-  Representing the 2-D vector mapping function $\bm{\psi}_m[\cdot]$
-  with $Q^3$ binary variables:
+  \frametitle{Design Criterion}
+  \begin{enumerate}
+    \item<1-> Successive optimization of BER upperbound based on PEP.
+    \begin{align*}
+      & \min_{\psi^{(m)}|\psi^{(k)},k=0,\ldots,m-1}P_{BER}^{(m)},\,m=1,\ldots,M
+      \\ & P_{BER}^{(m)} = \sum_{p=0}^{Q - 1}\sum_{q=0}^{Q - 1}\frac{D[p,
+      q]}{Q\log_2Q}P_{PEP}^{(m)}(q|p),
+    \end{align*}
+    \item<2> Again a closed-form approximation to $P_{PEP}^{(m)}(q|p)$ that can
+    be iteratively updated for growing $m$.
+    \begin{align*}
+      \tilde{P}_{PEP}^{(m)}(q|p) &= \tilde{P}_{PEP}^{(m -
+      1)}(q|p)E_m[p,q] \\
+      \tilde{P}_{PEP}^{(-1)}(q|p) &= 1 / 2
+    \end{align*}
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Approximation of the Pairwise Error Probability}
   \begin{align*}
-    x_{pij}^{(m)} = \left\{ \begin{array}{cc}1 & \mbox{if } \bm{\psi}_m[p] =
+    E_n[p,q] &= \mathbb{E}\left[\exp\left(-\frac{\|\mathbf{A}^{(n)}
+    \mathbf{e}^{(n)}[p,q]\|^2}{4\sigma^2}\right)\right] \\
+    &= \frac{(4\sigma^2)^{N_R}\exp\left(-\bm{\mu}_n^H
+    [p,q]\mathbf{S}_n^{-1}[p,q]\bm{\mu}_n[p,q]\right)} {\det(\mathbf{S}_n[p,q])}
+    \\
+    \mathbf{S}_n[p,q] & =
+    4\sigma^2\mathbf{I} +
+    \sum_{a=1,2} \frac{|e_a^{(n)}[p,q]|^2 \mathbf{p}_a^H\mathbf{T}_a
+    \mathbf{p}_a}{K_a+1} \mathbf{R},\notag\\
+    \bm{\mu}_n[p,q] & = \sum_{a=1,2}
+    \sqrt{\frac{K_a}{K_a+1}}\bar{\mathbf{H}}_a\mathbf{p}_ae_a^{(n)}[p,q].
+  \end{align*}
+  \begin{itemize}
+    \item $\sigma^2$: the noise power at each receiver antenna.
+    \item $\mathbf{e}^{(n)}[p,q] = [e_1^{(n)}[p,q], e_2^{(n)}[p,q]]^T =
+    \bm{\psi}^{(n)}[p] - \bm{\psi}^{(n)}[q]$.
+  \end{itemize}
+\end{frame}
+  
+\begin{frame}
+  \frametitle{Representation of CoRe}
+  Representing the 2-D vector mapping function
+  $\bm{\psi}^{(m)}[\cdot]= (\bm{\psi}_1^{(m)}, \bm{\psi}_2^{(m)})^T$ with $Q^3$
+  binary variables:
+  \begin{align*}
+    x_{pij}^{(m)} = \left\{ \begin{array}{cc}1 & \mbox{if } \bm{\psi}^{(m)}[p] =
     (\psi_0[i], \psi_0[j])^T\\ 0 & \mbox{otherwise.}\end{array} \right. \,
     p, i, j = 0,\ldots, Q - 1
   \end{align*}
   $\psi_0$ represents Gray-mapping for the original transmission (fixed).
-  \begin{block}{Constraints: $\bm{\psi}_m[\cdot]$ as a permutation of $0,\ldots,
-  Q - 1$}
+  \begin{block}{Constraints: $\bm{\psi}^{(m)}[\cdot]$ as a permutation of
+  $0,\ldots, Q - 1$}
     \begin{columns}
       \column{.3\textwidth}
       \begin{align*}
@@ -641,12 +686,9 @@ Multiple-Output HARQ Channel}
   \frametitle{A Successive Q3AP Formulation}
   \begin{block}{MoDiv design via successive Q3AP}
     \begin{enumerate}[<+->]
-      \item Set $m = 1$. Initialize the ``distance'' matrix and the approximated
-      PEP, for $p, q, i, j, k, l=0,\ldots,Q-1$:
-      \begin{align*}
-        d_{ikjl} = \tilde{E}_0[i,k,j,l],\; \tilde{P}_{PEP}^{(0)}(q|p) =
-        d_{pqpq}/2
-      \end{align*}
+      \item Set $m = 1$. Initialize the ``distance'' matrix $d_{ikjl}$ (see
+      next) and the approximated PEP as $tilde{P}_{PEP}^{(0)}(q|p) =
+        d_{pqpq}/2$, for $p, q, i, j, k, l=0,\ldots,Q-1$.
       \item Evaluate the ``flow'' matrix:
       \begin{align*}
         f_{pq}^{(m)} = \frac{D[p,q]}{Q\log_2Q}\tilde{P}_{PEP}^{(m-1)}(q|p)
@@ -681,22 +723,21 @@ Multiple-Output HARQ Channel}
 \end{frame}
 
 \begin{frame}
-  \frametitle{Approximation of the Pairwise Error Probability}
+  \frametitle{Evaluating the Distance Matrix using Approximated PEP}
   \begin{align*}
-    & \tilde{E}_0[i,k,j,l] = \mathbb{E}\left[\exp\left(-\frac{\|\mathbf{H}
-    \mathbf{e}_0[i,k,j,l]\|^2}{4\sigma^2}\right)\right]\\
-    &= \frac{(4\sigma^2)^{N_R}}{\det(\mathbf{S})}
-        \exp\left(-\bm{\mu}^H\mathbf{S}^{-1}
-        \bm{\mu}\right) \\
-    & \bm{\mu} = \sqrt{\frac{K}{K+1}}\mathbf{H}_0\mathbf{e}[i,k,j,l],\\
-    & \mathbf{S} = 4\sigma^2\mathbf{I} + \frac{1}{K + 1}
-    (\mathbf{e}^H[i,k,j,l]\mathbf{T}\mathbf{e}[i,k,j,l])\mathbf{R}
+    d_{ikjl} & =
+    \frac{(4\sigma^2)^{N_R}
+    \exp(-\bm{\mu}_{ikjl}^H\mathbf{S}_{ikjl}^{-1}\bm{\mu}_{ikjl})} {\det(\mathbf{S}_{ikjl})}
   \end{align*}
-  \begin{itemize}
-    \item $\sigma^2$: the noise power at each receiver antenna.
-    \item $\mathbf{e}[i,k,j,l] = (\psi_0[i] - \psi_0[k], \psi_0[j] -
-    \psi_0[l])^T$
-  \end{itemize}
+  where
+  \begin{align*}
+    \mathbf{S}_{ikjl} & = 4\sigma^2\mathbf{I} + \left(\frac{|e_{ik}|^2
+    \mathbf{p}_1^H\mathbf{T}_1 \mathbf{p}_1}{K_1+1} + \frac{|e_{jl}|^2
+    \mathbf{p}_2^H\mathbf{T}_2 \mathbf{p}_2}{K_2+1}\right) \mathbf{R},\notag\\
+    \bm{\mu}_{ikjl} & = \sqrt{\frac{K_1}{K_1+1}}\bar{\mathbf{H}}_1\mathbf{p}_1
+    e_{ik} + \sqrt{\frac{K_2}{K_2+1}}\bar{\mathbf{H}}_2\mathbf{p}_2e_{jl}.
+  \end{align*}
+  and $e_{ik} = \psi_0[i] - \psi_0[k]$, $e_{jl} = \psi_0[j] - \psi_0[l]$.
 \end{frame}
 
 \begin{frame}
@@ -706,11 +747,11 @@ Multiple-Output HARQ Channel}
     \item The $Q^4$ ``distance'' matrix has $Q^4$ elelments. However, for
     $Q$-QAM constellation, it only has $\mathcal{O}(Q^2)$ unique value, can be
     computed more efficiently.
-    \item When $N_T > 2$, the MoDiv design can be formulated into a quadratic
-    $(N_T + 1)$-dimensional problem, with $Q$-by-$Q$ ``flow'' matrix and $Q ^
-    {2N_T}$ ``distance'' matrix, which might be too complex to solve. However,
-    one can always apply a $N_T$-by-$2$ linear precoding matrix to reduce the
-    channel into a $N_R$-by-$2$ channel to partly explore modulation diveristy.
+    \item When there are $N > 2$ coordinated transmitters, the MoDiv design can
+    be formulated into a quadratic $(N + 1)$-dim problem, with
+    $Q$-by-$Q$ ``flow'' matrix and $Q ^ {2N}$ ``distance'' matrix. In practice,
+    the cluster size of CoMP is limited by backhaul link constraints and usually
+    $N=2,3$.
   \end{itemize}
 \end{frame}
 
@@ -720,8 +761,11 @@ Multiple-Output HARQ Channel}
   \begin{itemize}[<+->]
     \item 64-QAM constellation ($Q = 64$).
     \item Maximum number of 4 retransmissions ($M = 4$).
-    \item Correlated Rician-fading channels, $\mathbf{H}_0 = [1, 1]$,
-    correlation factor $\rho = 0.7$.
+    \item $N_R=1$, $N_{T,1}=N_{T,2}=2$, $\bar{\mathbf{H}}_1 = [0.2540;
+    0.2457]$, $\bar{\mathbf{H}}_2 = [-0.1027;
+    0.2320]$, $\mathbf{T}_1 = \mathbf{T}_2 = [1,0.7;0.7,1]$, $K_1=K_2=4$.
+    \item $\mathbf{p}_1$ and $\mathbf{p}_2$ are optimized as maximum SNR
+    beamformer (MSNRB).
     \item Use a modified iterative local search algorithm\footnotemark to
     solve each Q3AP numerically.
     \item Compare 3 MoDiv schemes:
@@ -732,7 +776,7 @@ Multiple-Output HARQ Channel}
         \item Q3AP-based solution (Q3AP).
       \end{enumerate}
   \end{itemize}
-  \footnotetext[1]{T. St\"{u}tzle, and D. Marco, ``Local search and
+  \footnotetext[3]{T. St\"{u}tzle, and D. Marco, ``Local search and
   metaheuristics for the quadratic assignment problem,'' Technical Report
   AIDA-01-01, Intellectics Group, Darmstadt University of Technology, Germany,
   2001.}
@@ -740,16 +784,17 @@ Multiple-Output HARQ Channel}
 
 \begin{frame}
   \frametitle{Numerical Results: Uncoded BER vs Noise Power}
+  $m=0,\ldots,4$ represents different round of HARQ (re)transmissions.
   \begin{columns}
     \column{.5\textwidth}
     \begin{figure}
-      \includegraphics[width=0.9\textwidth]{figs/BER_noise_power_MonteCarlo_64QAM_23_Q3AP.pdf}
+      \includegraphics[width=1.0\textwidth]{figs/BER_noise_power_MonteCarlo_64QAM_23_Q3AP.pdf}
       \caption{$m=1,2$.}
     \end{figure}
     
     \column{.5\textwidth}
     \begin{figure}
-      \includegraphics[width=0.9\textwidth]{figs/BER_noise_power_MonteCarlo_64QAM_45_Q3AP.pdf}
+      \includegraphics[width=1.0\textwidth]{figs/BER_noise_power_MonteCarlo_64QAM_45_Q3AP.pdf}
       \caption{$m=3,4$.}
     \end{figure}
   \end{columns}
@@ -761,14 +806,14 @@ Multiple-Output HARQ Channel}
   \begin{columns}
     \column{.5\textwidth}
     \begin{figure}
-      \includegraphics[width=0.9\textwidth]{figs/BER_K_MonteCarlo_64QAM_6.pdf}
-      \caption{$m=1,2$, $1/\sigma^2 = 6dB$.}
+      \includegraphics[width=1.0\textwidth]{figs/BER_K_MonteCarlo_64QAM_18.pdf}
+      \caption{$m=1,2$, $1/\sigma^2 = 18dB$.}
     \end{figure}
     
     \column{.5\textwidth}
     \begin{figure}
-      \includegraphics[width=0.9\textwidth]{figs/BER_K_MonteCarlo_64QAM_2.pdf}
-      \caption{$m=3,4$, $1/\sigma^2 = 2dB$.}
+      \includegraphics[width=1.0\textwidth]{figs/BER_K_MonteCarlo_64QAM_8.pdf}
+      \caption{$m=3,4$, $1/\sigma^2 = 8dB$.}
     \end{figure}
   \end{columns}
 \end{frame}
@@ -778,13 +823,13 @@ Multiple-Output HARQ Channel}
   \begin{columns}
     \column{.5\textwidth}
     \begin{figure}
-      \includegraphics[width=0.9\textwidth]{figs/waterfall_2M3M_64QAM_Q3AP.pdf}
+      \includegraphics[width=1.0\textwidth]{figs/waterfall_64QAM_Q3AP_12.pdf}
       \caption{$m=1,2$.}
     \end{figure}
     
     \column{.5\textwidth}
     \begin{figure}
-      \includegraphics[width=0.9\textwidth]{figs/waterfall_4M5M_64QAM_Q3AP.pdf}
+      \includegraphics[width=1.0\textwidth]{figs/waterfall_64QAM_Q3AP_34.pdf}
       \caption{$m=3,4$.}
     \end{figure}
   \end{columns}
@@ -793,7 +838,7 @@ Multiple-Output HARQ Channel}
 \begin{frame}
   \frametitle{Numerical Results: Average Throughput}
   \begin{figure}
-    \includegraphics[width=0.7\textwidth]{figs/throughput_5M_64QAM_Q3AP.pdf}
+    \includegraphics[width=0.8\textwidth]{figs/throughput_64QAM_Q3AP.pdf}
     \caption{Throughput comparison.}
   \end{figure}
 \end{frame}
@@ -806,13 +851,19 @@ Multiple-Output HARQ Channel}
     communication system into Quadratic Assignment Problems (QAPs):
     \begin{enumerate}
       \item Two-Way Relay Analog Network Coding Rayleigh-fading channel:
-      successive Koopman-Beckmann QAP.
-      \item Correlated Rician-fading Multiple-Input and Multiple-Output channel:
-      successive Q3AP.
+      successive Koopman-Beckmann QAP\footnotemark.
+      \item Correlated Rician-fading Multiple-Input and Multiple-Output
+      Coordinated Multi-Point channel:
+      successive Q3AP\footnotemark.
     \end{enumerate}
     \item Significant performance gain for a wide range of settings over
     existing heuristic MoDiv schemes. 
   \end{itemize}
+  \footnotetext[4]{W. Wu, H. Mittelmann and Z. Ding, ``Modulation Design for
+  Two-Way Amplify-and-Forward Relay HARQ,'' IEEE Wireless Commun.
+  Lett., vol. 5, no. 3, pp. 244-247, June 2016.}
+  \footnotetext[5]{W. Wu, H. Mittelmann and Z. Ding, ``Modulation Design for
+  MIMO-CoMP HARQ,'' submitted for publication.}
 \end{frame}
 %------------------------------------------------
 
